@@ -3,418 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster Pro - Coffee Edition</title>
+    <title>TaskMaster Calendar Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2b1810">
     <style>
+        /* Paletas de color elegibles por el usuario */
+        .theme-cafe {
+            --bg-main: #2b1810; --bg-card: #3d251c; --bg-input: #1f100a;
+            --text-main: #f5ebe6; --text-muted: #b59e93; --accent: #df9a57;
+        }
+        .theme-gris {
+            --bg-main: #1a1a1a; --bg-card: #2a2a2a; --bg-input: #111111;
+            --text-main: #ffffff; --text-muted: #888888; --accent: #707070;
+        }
+        .theme-marino {
+            --bg-main: #0f172a; --bg-card: #1e293b; --bg-input: #020617;
+            --text-main: #f8fafc; --text-muted: #94a3b8; --accent: #38bdf8;
+        }
+
         :root {
-            --bg-main: #2b1810;        /* Café grano oscuro */
-            --bg-card: #3d251c;        /* Café tostado */
-            --bg-input: #1f100a;       /* Espresso puro */
-            --text-main: #f5ebe6;      /* Crema ligero */
-            --text-muted: #b59e93;     /* Café con leche suave */
-            --accent-amber: #df9a57;   /* Caramelo / Ámbar para acciones principales */
-            --color-high: #cd4439;     /* Alerta Roja (Cálida) */
-            --color-medium: #d48c3f;   /* Alerta Naranja (Canela) */
-            --color-low: #7fa96e;      /* Alerta Verde (Menta suave) */
+            --color-high: #cd4439;
+            --color-medium: #d48c3f;
+            --color-low: #7fa96e;
         }
 
         * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            box-sizing: border-box; margin: 0; padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            padding: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            background-color: var(--bg-main); color: var(--text-main);
+            padding: 16px; display: flex; justify-content: center; min-height: 100vh;
+            transition: all 0.3s ease;
         }
 
         .app-container {
-            width: 100%;
-            max-width: 480px;
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
-            border: 1px solid #4a3025;
+            width: 100%; max-width: 480px; background: var(--bg-card);
+            border-radius: 24px; padding: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden;
         }
 
-        h1 {
-            font-size: 1.6rem;
-            margin-bottom: 24px;
-            font-weight: 700;
-            text-align: center;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
+        .screen { display: none; animation: slideIn 0.25s ease forwards; }
+        .screen.active { display: block; }
 
-        h2 {
-            font-size: 1.2rem;
-            margin-top: 32px;
-            margin-bottom: 16px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input, select {
-            background: var(--bg-input);
-            border: 1px solid #4a3025;
-            color: var(--text-main);
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.2s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
-        }
-
-        input:focus, select:focus {
-            border-color: var(--accent-amber);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 0 3px rgba(223, 154, 87, 0.2);
-        }
-
-        /* Botón Principal de Guardado (Estilo Ámbar/Caramelo) */
-        .btn-primary {
-            background: linear-gradient(135deg, #df9a57, #c77d39);
-            color: #1f100a;
-            border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(223, 154, 87, 0.3);
-            transition: transform 0.1s, box-shadow 0.2s;
-            width: 100%;
-            margin-top: 12px;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 6px rgba(223, 154, 87, 0.2);
-        }
-
-        /* Línea de tiempo interactiva */
-        .timeline {
-            position: relative;
-            padding-left: 24px;
-            border-left: 3px dashed #4a3025;
-            margin-left: 8px;
-        }
-
-        .task-card {
-            background: var(--bg-input);
-            border: 1px solid #331b12;
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 16px;
-            position: relative;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Indicadores de prioridad en los nodos tátiles */
-        .task-card::before {
-            content: '';
-            position: absolute;
-            left: -32px;
-            top: 24px;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            border: 3px solid var(--bg-card);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        /* Configuración de Temas superiores */
+        .theme-selector {
+            display: flex; gap: 8px; margin-bottom: 20px; justify-content: space-between;
+            align-items: center; background: var(--bg-input); padding: 10px; border-radius: 12px;
+        }
+        .theme-dot {
+            width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+        }
+        .theme-dot.active { border-color: var(--text-main); }
+
+        /* Calendario de Rejilla */
+        .calendar-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+        }
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center;
+        }
+        .calendar-day-name { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; padding-bottom: 6px; }
+        
+        .calendar-cell {
+            background: var(--bg-input); aspect-ratio: 1; border-radius: 12px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; transition: transform 0.1s; font-weight: 600;
+        }
+        .calendar-cell:active { transform: scale(0.92); }
+        .calendar-cell.today { border: 2px solid var(--accent); }
+
+        /* Barra fina de colores debajo del número */
+        .indicator-bar-container {
+            position: absolute; bottom: 6px; left: 6px; right: 6px;
+            display: flex; gap: 2px; height: 3px; border-radius: 2px; overflow: hidden;
+        }
+        .ind-bar { flex: 1; height: 100%; }
+
+        /* Pantalla de Formulario y detalles */
+        .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 0.8rem; font-weight: bold; color: var(--text-muted); }
+        input, select {
+            background: var(--bg-input); border: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-main); padding: 12px; border-radius: 12px; outline: none; font-size: 1rem;
         }
 
-        .task-card.priority-high::before { background: var(--color-high); }
-        .task-card.priority-medium::before { background: var(--color-medium); }
-        .task-card.priority-low::before { background: var(--color-low); }
-
-        .task-title {
-            font-weight: 700;
-            font-size: 1.15rem;
-            color: var(--text-main);
-            margin-bottom: 6px;
+        .btn {
+            padding: 14px; border-radius: 12px; border: none; font-weight: bold;
+            font-size: 1rem; cursor: pointer; text-align: center; width: 100%; transition: transform 0.1s;
         }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--accent); color: var(--bg-input); font-weight: 800; margin-top: 10px; }
+        .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); margin-top: 8px; }
 
-        .task-meta {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .event-item {
+            background: var(--bg-input); padding: 12px; border-radius: 12px; margin-top: 10px;
+            border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center;
         }
-
-        /* Botones de acción específicos por combinación */
-        .task-actions {
-            margin-top: 16px;
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-action {
-            flex: 1;
-            padding: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.1s;
-            color: #ffffff;
-        }
-
-        .btn-action:active {
-            transform: scale(0.95);
-        }
-
-        /* Botón Hecho: Combinación Verde Foresta / Menta */
-        .btn-complete {
-            background: linear-gradient(135deg, #5b8c4e, #436a37);
-            box-shadow: 0 3px 10px rgba(67, 106, 55, 0.3);
-        }
-
-        /* Botón Eliminar: Combinación Terracota / Óxido */
-        .btn-delete {
-            background: linear-gradient(135deg, #ba4338, #912f26);
-            box-shadow: 0 3px 10px rgba(145, 47, 38, 0.3);
-        }
+        .btn-mini-del { background: var(--color-high); border: none; color: white; padding: 4px 8px; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
-<body>
+<body class="theme-cafe">
 
     <div class="app-container">
-        <h1>TaskMaster Mocha</h1>
         
-        <div class="form-group">
-            <label>Nombre de la tarea</label>
-            <input type="text" id="taskTitle" placeholder="Ej. Revisar bitácora de viaje">
+        <!-- PANTALLA 1: CALENDARIO PRINCIPAL -->
+        <div id="screen-calendar" class="screen active">
+            <div class="theme-selector">
+                <span style="font-size: 0.85rem; font-weight: bold;">COLOR CALENDARIO:</span>
+                <div style="display: flex; gap: 8px;">
+                    <div class="theme-dot active" style="background:#df9a57;" onclick="setTheme('cafe', this)"></div>
+                    <div class="theme-dot" style="background:#707070;" onclick="setTheme('gris', this)"></div>
+                    <div class="theme-dot" style="background:#38bdf8;" onclick="setTheme('marino', this)"></div>
+                </div>
+            </div>
+
+            <div class="calendar-header">
+                <h2 id="calendar-month-year" style="margin:0; color: var(--text-main);">Junio 2026</h2>
+            </div>
+
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- Generado dinámicamente -->
+            </div>
         </div>
 
-        <div class="form-group">
-            <label>Fecha y Hora de Alerta</label>
-            <input type="datetime-local" id="taskTime">
+        <!-- PANTALLA 2: PROGRAMACIÓN DE EVENTOS -->
+        <div id="screen-events" class="screen">
+            <h2 id="selected-date-title" style="margin: 0 0 16px 0; color: var(--text-main);">Eventos</h2>
+            
+            <div class="form-group">
+                <label>Título del Evento</label>
+                <input type="text" id="eventTitle" placeholder="Ej. Entrega o Inspección">
+            </div>
+
+            <div class="form-group">
+                <label>Hora exacta de alerta</label>
+                <input type="time" id="eventTime">
+            </div>
+
+            <div class="form-group">
+                <label>Prioridad (Color de Barra)</label>
+                <select id="eventPriority">
+                    <option value="low">Baja (Menta)</option>
+                    <option value="medium">Media (Canela)</option>
+                    <option value="high">Alta (Terracota)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Ubicación Alarma Inteligente (Geofencing)</label>
+                <select id="eventLoc">
+                    <option value="none">Ninguna</option>
+                    <option value="central">Cochera Central / Almacén</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveEvent()">Guardar Evento en esta Fecha</button>
+            <button class="btn btn-secondary" onclick="changeScreen('calendar')">Volver al Calendario</button>
+
+            <h3 style="margin-top: 24px; font-size: 1rem; color: var(--text-muted);">Eventos en este día:</h3>
+            <div id="current-day-events"></div>
         </div>
 
-        <div class="form-group">
-            <label>Prioridad / Nivel de Alerta</label>
-            <select id="taskPriority">
-                <option value="low">Baja (Normal)</option>
-                <option value="medium">Media (Aviso previo 15 min)</option>
-                <option value="high">Alta (Crítica + Alarma continua)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Recurrencia (Repetir)</label>
-            <select id="taskRepetition">
-                <option value="none">No repetir</option>
-                <option value="daily">Diariamente</option>
-                <option value="weekly">Semanalmente</option>
-            </select>
-        </div>
-
-        <button class="btn-primary" onclick="addTask()">Programar Tarea</button>
-
-        <h2>Línea de Tiempo</h2>
-        <div class="timeline" id="timeline"></div>
     </div>
 
     <script>
         // medbasha
-        let tasks = JSON.parse(localStorage.getItem('pro_tasks')) || [];
-        let activeTimeout = null;
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registrado', reg))
-                    .catch(err => console.error('Error Worker', err));
-            }
+        let events = JSON.parse(localStorage.getItem('cal_events')) || [];
+        let currentYear = 2026;
+        let currentMonth = 5; // Junio (Index 0-11)
+        let selectedDateStr = '';
 
-            if (Notification.permission !== 'granted') {
-                Notification.requestPermission();
-            }
-            renderTasks();
-            programNextAlert();
+        // Coordenada simulada de zona crítica
+        const targetZone = { lat: 39.89, lon: 4.25 }; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Notification.permission !== 'granted') Notification.requestPermission();
+            initCalendar();
+            initSmartTracking();
         });
 
-        function addTask() {
-            const title = document.getElementById('taskTitle').value;
-            const timeStr = document.getElementById('taskTime').value;
-            const priority = document.getElementById('taskPriority').value;
-            const repeat = document.getElementById('taskRepetition').value;
+        function setTheme(themeName, element) {
+            document.body.className = 'theme-' + themeName;
+            document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+            element.classList.add('active');
+        }
 
-            if (!title || !timeStr) return alert("Por favor, rellena los campos principales.");
+        function changeScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + screen).classList.add('active');
+        }
 
-            const task = {
-                id: 'task_' + Date.now(),
-                title,
-                time: new Date(timeStr).getTime(),
-                priority,
-                repeat,
-                completed: false,
-                notified: false,
-                preNotified: false
-            };
+        function initCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
 
-            tasks.push(task);
-            saveAndRefresh();
+            const dayNames = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+            dayNames.forEach(name => {
+                const el = document.createElement('div');
+                el.className = 'calendar-day-name';
+                el.innerText = name;
+                grid.appendChild(el);
+            });
+
+            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
             
-            // Limpiar inputs estéticos tras guardar
-            document.getElementById('taskTitle').value = '';
-            document.getElementById('taskTime').value = '';
-        }
-
-        function renderTasks() {
-            const timeline = document.getElementById('timeline');
-            timeline.innerHTML = '';
-
-            tasks.sort((a, b) => a.time - b.time);
-
-            tasks.forEach(task => {
-                if (task.completed) return;
-
-                const card = document.createElement('div');
-                card.className = `task-card priority-${task.priority}`;
+            for (let i = 1; i <= totalDays; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'calendar-cell';
+                cell.innerText = i;
                 
-                const dateStr = new Date(task.time).toLocaleString([], {hour: '2-digit', minute:'2-digit', day: '2-digit', month: '2-digit'});
-                let repeatText = task.repeat !== 'none' ? `🔁 Repetición: ${task.repeat}` : '';
-
-                card.innerHTML = `
-                    <div class="task-title">${task.title}</div>
-                    <div class="task-meta">
-                        <span>⏰ ${dateStr}</span>
-                        ${repeatText ? `<span>${repeatText}</span>` : ''}
-                    </div>
-                    <div class="task-actions">
-                        <button class="btn-action btn-complete" onclick="completeTask('${task.id}')">Hecho</button>
-                        <button class="btn-action btn-delete" onclick="deleteTask('${task.id}')">Eliminar</button>
-                    </div>
-                `;
-                timeline.appendChild(card);
-            });
-        }
-
-        function programNextAlert() {
-            if (activeTimeout) clearTimeout(activeTimeout);
-            if (tasks.length === 0) return;
-
-            const now = Date.now();
-            const futureTasks = tasks.filter(t => !t.completed);
-
-            if (futureTasks.length === 0) return;
-
-            let nextTargetTime = Infinity;
-            let nextTaskInstance = null;
-            let isPreNotification = false;
-
-            futureTasks.forEach(task => {
-                if ((task.priority === 'medium' || task.priority === 'high') && !task.preNotified) {
-                    const preTime = task.time - (15 * 60 * 1000);
-                    if (preTime > now && preTime < nextTargetTime) {
-                        nextTargetTime = preTime;
-                        nextTaskInstance = task;
-                        isPreNotification = true;
-                    }
-                }
-                if (!task.notified && task.time > now && task.time < nextTargetTime) {
-                    nextTargetTime = task.time;
-                    nextTaskInstance = task;
-                    isPreNotification = false;
-                }
-            });
-
-            if (!nextTaskInstance || nextTargetTime === Infinity) return;
-
-            const timeToWait = nextTargetTime - now;
-
-            activeTimeout = setTimeout(() => {
-                if (isPreNotification) {
-                    triggerNotification(`Aviso previo: ${nextTaskInstance.title} en 15 min.`);
-                    nextTaskInstance.preNotified = true;
-                } else {
-                    triggerNotification(`¡Es hora! Tarea: ${nextTaskInstance.title}`);
+                const dateKey = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                
+                // Pintar barras finas si existen eventos
+                const dayEvents = events.filter(e => e.date === dateKey);
+                if (dayEvents.length > 0) {
+                    const barContainer = document.createElement('div');
+                    barContainer.className = 'indicator-bar-container';
                     
-                    if (nextTaskInstance.priority === 'high') {
-                        nextTaskInstance.time = Date.now() + (60 * 1000);
-                        triggerNotification(`[CRÍTICA] Volverá a alertar en 1 minuto si no se completa.`);
-                    } else {
-                        nextTaskInstance.notified = true;
-                    }
-
-                    if (nextTaskInstance.repeat !== 'none') {
-                        handleRepetition(nextTaskInstance);
-                    }
+                    dayEvents.slice(0, 3).forEach(ev => {
+                        const bar = document.createElement('div');
+                        bar.className = 'ind-bar';
+                        bar.style.backgroundColor = `var(--color-${ev.priority})`;
+                        barContainer.appendChild(bar);
+                    });
+                    cell.appendChild(barContainer);
                 }
-                saveAndRefresh();
-            }, timeToWait);
+
+                cell.onclick = () => openDate(dateKey);
+                grid.appendChild(cell);
+            }
         }
 
-        function handleRepetition(task) {
-            const currentObj = new Date(task.time);
-            if (task.repeat === 'daily') {
-                currentObj.setDate(currentObj.getDate() + 1);
-            } else if (task.repeat === 'weekly') {
-                currentObj.setDate(currentObj.getDate() + 7);
-            }
-            task.time = currentObj.getTime();
-            task.notified = false;
-            task.preNotified = false;
+        function openDate(dateKey) {
+            selectedDateStr = dateKey;
+            document.getElementById('selected-date-title').innerText = `Gestión: ${dateKey}`;
+            renderDayEvents();
+            changeScreen('events');
+        }
+
+        function saveEvent() {
+            const title = document.getElementById('eventTitle').value;
+            const time = document.getElementById('eventTime').value;
+            const priority = document.getElementById('eventPriority').value;
+            const loc = document.getElementById('eventLoc').value;
+
+            if (!title || !time) return alert("Rellena los datos básicos.");
+
+            events.push({
+                id: 'ev_' + Date.now(),
+                date: selectedDateStr,
+                title, time, priority, loc,
+                notified: false
+            });
+
+            localStorage.setItem('cal_events', JSON.stringify(events));
+            renderDayEvents();
+            initCalendar();
+
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventTime').value = '';
+        }
+
+        function renderDayEvents() {
+            const container = document.getElementById('current-day-events');
+            container.innerHTML = '';
+            const dayEvents = events.filter(e => e.date === selectedDateStr);
+
+            dayEvents.forEach(ev => {
+                const div = document.createElement('div');
+                div.className = 'event-item';
+                div.style.borderLeftColor = `var(--color-${ev.priority})`;
+                div.innerHTML = `
+                    <div>
+                        <strong>[${ev.time}] ${ev.title}</strong>
+                        ${ev.loc !== 'none' ? '<br><small>📍 Alerta Inteligente de Zona</small>' : ''}
+                    </div>
+                    <button class="btn-mini-del" onclick="deleteEvent('${ev.id}')">X</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function deleteEvent(id) {
+            events = events.filter(e => e.id !== id);
+            localStorage.setItem('cal_events', JSON.stringify(events));
+            renderDayEvents();
+            initCalendar();
+        }
+
+        // Algoritmo de Inteligencia Artificial de proximidad eficiente (Anti-gasto batería)
+        function initSmartTracking() {
+            if (!navigator.geolocation) return;
+
+            setInterval(() => {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const { latitude, longitude, speed } = pos.coords;
+                    
+                    events.forEach(ev => {
+                        if (ev.loc === 'none' || ev.notified) return;
+
+                        const distanceKm = calculateDistance(latitude, longitude, targetZone.lat, targetZone.lon);
+                        
+                        // Velocidad estimada por defecto (50 km/h) si no la detecta el hardware
+                        const currentSpeedKmh = speed ? (speed * 3.6) : 50; 
+                        const timeToArrivalMinutes = (distanceKm / currentSpeedKmh) * 60;
+
+                        // Lanzar alarma inteligentemente exactamente 5 minutos antes de la llegada estimada a la zona
+                        if (timeToArrivalMinutes <= 5 && distanceKm > 0.1) {
+                            triggerNotification(`🤖 IA Predictiva: Te aproximas a la zona en 5 min. Tarea pendiente: ${ev.title}`);
+                            ev.notified = true;
+                            localStorage.setItem('cal_events', JSON.stringify(events));
+                        }
+                    });
+                });
+            }, 30000); // Frecuencia reducida a 30 segundos (Equilibrio perfecto ahorro/precisión)
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
         function triggerNotification(text) {
             if (Notification.permission === 'granted') {
-                new Notification("TaskMaster Mocha", {
-                    body: text,
-                    icon: "icon.png"
-                });
+                new Notification("TaskMaster Inteligencia", { body: text });
             }
-        }
-
-        function completeTask(id) {
-            tasks = tasks.map(t => t.id === id ? { ...t, completed: true } : t);
-            saveAndRefresh();
-        }
-
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            saveAndRefresh();
-        }
-
-        function saveAndRefresh() {
-            localStorage.setItem('pro_tasks', JSON.stringify(tasks));
-            renderTasks();
-            programNextAlert();
         }
     </script>
 </body>
