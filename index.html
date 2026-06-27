@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster Pro</title>
+    <title>TaskMaster Pro - Coffee Edition</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#121214">
+    <meta name="theme-color" content="#2b1810">
     <style>
         :root {
-            --bg-main: #121214;
-            --bg-card: #1e1e24;
-            --text-main: #ffffff;
-            --text-muted: #a0a0b0;
-            --accent-gray: #3a3a42;
-            --color-high: #ff4d4d;
-            --color-medium: #ff9933;
-            --color-low: #33cc66;
+            --bg-main: #2b1810;        /* Café grano oscuro */
+            --bg-card: #3d251c;        /* Café tostado */
+            --bg-input: #1f100a;       /* Espresso puro */
+            --text-main: #f5ebe6;      /* Crema ligero */
+            --text-muted: #b59e93;     /* Café con leche suave */
+            --accent-amber: #df9a57;   /* Caramelo / Ámbar para acciones principales */
+            --color-high: #cd4439;     /* Alerta Roja (Cálida) */
+            --color-medium: #d48c3f;   /* Alerta Naranja (Canela) */
+            --color-low: #7fa96e;      /* Alerta Verde (Menta suave) */
         }
 
         * {
@@ -23,152 +24,200 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
-            padding: 20px;
+            padding: 16px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
 
         .app-container {
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
             background: var(--bg-card);
-            border-radius: 16px;
+            border-radius: 24px;
             padding: 24px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid #4a3025;
         }
 
-        h1, h2 {
-            margin-bottom: 20px;
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 24px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            color: var(--text-muted);
             font-weight: 600;
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         label {
             font-size: 0.85rem;
+            font-weight: 600;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         input, select {
-            background: var(--bg-main);
-            border: 1px solid var(--accent-gray);
+            background: var(--bg-input);
+            border: 1px solid #4a3025;
             color: var(--text-main);
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 12px;
             font-size: 1rem;
             outline: none;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
         }
 
         input:focus, select:focus {
-            border-color: var(--text-muted);
+            border-color: var(--accent-amber);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 0 3px rgba(223, 154, 87, 0.2);
         }
 
-        button {
-            background: #4a4ae8;
-            color: white;
+        /* Botón Principal de Guardado (Estilo Ámbar/Caramelo) */
+        .btn-primary {
+            background: linear-gradient(135deg, #df9a57, #c77d39);
+            color: #1f100a;
             border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: bold;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(223, 154, 87, 0.3);
+            transition: transform 0.1s, box-shadow 0.2s;
             width: 100%;
+            margin-top: 12px;
         }
 
-        button:hover {
-            background: #3b3be0;
+        .btn-primary:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 6px rgba(223, 154, 87, 0.2);
         }
 
+        /* Línea de tiempo interactiva */
         .timeline {
-            margin-top: 30px;
             position: relative;
-            padding-left: 20px;
-            border-left: 2px solid var(--accent-gray);
+            padding-left: 24px;
+            border-left: 3px dashed #4a3025;
+            margin-left: 8px;
         }
 
         .task-card {
-            background: var(--bg-main);
-            border: 1px solid var(--accent-gray);
-            border-radius: 10px;
-            padding: 16px;
+            background: var(--bg-input);
+            border: 1px solid #331b12;
+            border-radius: 16px;
+            padding: 18px;
             margin-bottom: 16px;
             position: relative;
-            transition: transform 0.2s;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Indicadores de prioridad en los nodos tátiles */
         .task-card::before {
             content: '';
             position: absolute;
-            left: -27px;
-            top: 22px;
-            width: 12px;
-            height: 12px;
+            left: -32px;
+            top: 24px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background: var(--accent-gray);
+            border: 3px solid var(--bg-card);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .task-card.priority-high::before { background: var(--color-high); }
         .task-card.priority-medium::before { background: var(--color-medium); }
         .task-card.priority-low::before { background: var(--color-low); }
 
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
         .task-title {
-            font-weight: 600;
-            font-size: 1.1rem;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--text-main);
+            margin-bottom: 6px;
         }
 
         .task-meta {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
         }
 
+        /* Botones de acción específicos por combinación */
         .task-actions {
-            margin-top: 12px;
+            margin-top: 16px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn-action {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            border-radius: 4px;
-            width: auto;
-            margin: 0;
+            flex: 1;
+            padding: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.1s;
+            color: #ffffff;
         }
 
-        .btn-complete { background: var(--color-low); }
-        .btn-delete { background: var(--color-high); }
+        .btn-action:active {
+            transform: scale(0.95);
+        }
+
+        /* Botón Hecho: Combinación Verde Foresta / Menta */
+        .btn-complete {
+            background: linear-gradient(135deg, #5b8c4e, #436a37);
+            box-shadow: 0 3px 10px rgba(67, 106, 55, 0.3);
+        }
+
+        /* Botón Eliminar: Combinación Terracota / Óxido */
+        .btn-delete {
+            background: linear-gradient(135deg, #ba4338, #912f26);
+            box-shadow: 0 3px 10px rgba(145, 47, 38, 0.3);
+        }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <h1>Nueva Tarea</h1>
+        <h1>TaskMaster Mocha</h1>
         
         <div class="form-group">
             <label>Nombre de la tarea</label>
-            <input type="text" id="taskTitle" placeholder="Ej. Revisar niveles del vehículo">
+            <input type="text" id="taskTitle" placeholder="Ej. Revisar bitácora de viaje">
         </div>
 
         <div class="form-group">
@@ -194,9 +243,9 @@
             </select>
         </div>
 
-        <button onclick="addTask()">Programar Tarea</button>
+        <button class="btn-primary" onclick="addTask()">Programar Tarea</button>
 
-        <h2 style="margin-top: 40px;">Línea de Tiempo</h2>
+        <h2>Línea de Tiempo</h2>
         <div class="timeline" id="timeline"></div>
     </div>
 
@@ -208,8 +257,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registrado con éxito', reg))
-                    .catch(err => console.error('Error al registrar Service Worker', err));
+                    .then(reg => console.log('Service Worker registrado', reg))
+                    .catch(err => console.error('Error Worker', err));
             }
 
             if (Notification.permission !== 'granted') {
@@ -240,6 +289,10 @@
 
             tasks.push(task);
             saveAndRefresh();
+            
+            // Limpiar inputs estéticos tras guardar
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskTime').value = '';
         }
 
         function renderTasks() {
@@ -258,9 +311,7 @@
                 let repeatText = task.repeat !== 'none' ? `🔁 Repetición: ${task.repeat}` : '';
 
                 card.innerHTML = `
-                    <div class="task-header">
-                        <span class="task-title">${task.title}</span>
-                    </div>
+                    <div class="task-title">${task.title}</div>
                     <div class="task-meta">
                         <span>⏰ ${dateStr}</span>
                         ${repeatText ? `<span>${repeatText}</span>` : ''}
@@ -343,7 +394,7 @@
 
         function triggerNotification(text) {
             if (Notification.permission === 'granted') {
-                new Notification("TaskMaster Alerta", {
+                new Notification("TaskMaster Mocha", {
                     body: text,
                     icon: "icon.png"
                 });
